@@ -1,0 +1,282 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "jaeger.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/traces": {
+      "get": {
+        "operationId": "GetTrace",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Trace"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "low",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "high",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "QueryServiceV1"
+        ]
+      },
+      "post": {
+        "operationId": "SaveBatch",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protobufEmpty"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Batch"
+            }
+          }
+        ],
+        "tags": [
+          "CollectorServiceV1"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Batch": {
+      "type": "object",
+      "properties": {
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Span"
+          }
+        },
+        "process": {
+          "$ref": "#/definitions/Process"
+        }
+      }
+    },
+    "KeyValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "vType": {
+          "$ref": "#/definitions/ValueType"
+        },
+        "vStr": {
+          "type": "string"
+        },
+        "vDouble": {
+          "type": "number",
+          "format": "double"
+        },
+        "vBool": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "vLong": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "vBinary": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "Log": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValue"
+          }
+        }
+      }
+    },
+    "Process": {
+      "type": "object",
+      "properties": {
+        "service_name": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValue"
+          }
+        }
+      }
+    },
+    "Span": {
+      "type": "object",
+      "properties": {
+        "traceID": {
+          "$ref": "#/definitions/TraceID"
+        },
+        "spanID": {
+          "$ref": "#/definitions/SpanID"
+        },
+        "operation_name": {
+          "type": "string"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpanRef"
+          }
+        },
+        "flags": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValue"
+          }
+        },
+        "logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Log"
+          }
+        },
+        "process": {
+          "$ref": "#/definitions/Process"
+        },
+        "processID": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SpanID": {
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "SpanRef": {
+      "type": "object",
+      "properties": {
+        "traceID": {
+          "$ref": "#/definitions/TraceID"
+        },
+        "spanID": {
+          "$ref": "#/definitions/SpanID"
+        },
+        "type": {
+          "$ref": "#/definitions/SpanRefType"
+        }
+      }
+    },
+    "SpanRefType": {
+      "type": "string",
+      "enum": [
+        "CHILD_OF",
+        "FOLLOWS_FROM"
+      ],
+      "default": "CHILD_OF"
+    },
+    "Trace": {
+      "type": "object",
+      "properties": {
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Span"
+          }
+        },
+        "processMap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Process"
+          }
+        }
+      }
+    },
+    "TraceID": {
+      "type": "object",
+      "properties": {
+        "low": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "high": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "ValueType": {
+      "type": "string",
+      "enum": [
+        "STRING",
+        "DOUBLE",
+        "BOOL",
+        "LONG",
+        "BINARY"
+      ],
+      "default": "STRING"
+    },
+    "protobufEmpty": {
+      "type": "object",
+      "description": "service Foo {\n      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n    }\n\nThe JSON representation for `Empty` is empty JSON object `{}`.",
+      "title": "A generic empty message that you can re-use to avoid defining duplicated\nempty messages in your APIs. A typical example is to use it as the request\nor the response type of an API method. For instance:"
+    }
+  }
+}
